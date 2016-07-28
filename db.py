@@ -1,4 +1,7 @@
+import sqlite3
 import random
+import os
+
 
 def db_items():
     item_pool = [
@@ -18,6 +21,7 @@ def db_items():
         ('Random Gift Night', 10, 50.0, 1)
         ]
     return item_pool
+
 
 def db_item_filter(amount=100):
     item_select = []
@@ -44,3 +48,55 @@ def db_item_filter(amount=100):
             item_select.append(item)
 
     return item_select
+
+
+def keepem_db():
+    if os.path.isfile('./keepem.db'):
+        os.remove('keepem.db')
+        conn = sqlite3.connect('keepem.db')
+        c = conn.cursor()
+        # create table
+        c.execute('''CREATE TABLE keepem
+            (id integer primary key, name text, value integer, cost real)'''
+        )
+        # commit and close connections
+        conn.commit()
+    return conn
+
+
+def keepem_insert(name, value, cost):
+    conn = sqlite3.connect('keepem.db')
+    c = conn.cursor()
+    # insert single item
+    c.execute("INSERT INTO keepem VALUES (NULL, name, value, cost)")
+    # save and close connection
+    conn.commit()
+    conn.close()
+
+
+def keepem_insertmany(list):
+    conn = sqlite3.connect('keepem.db')
+    c = conn.cursor()
+    # insert multiple items
+    token_list = [
+        (None, 'test_data_name', 10, 10.0),
+        (None, 'test_data_name', 10, 10.0),
+        (None, 'test_data_name', 10, 10.0),
+        ]
+    c.executemany('INSERT INTO keepem VALUES (?,?,?,?)', token_list)
+    # save and close connection
+    conn.commit()
+    conn.close()
+
+
+def keepem_find(string):
+    conn = sqlite3.connect('keepem.db')
+    c = conn.cursor()
+    # retrive single item
+    search_query = ('test_data_name',)
+    c.execute('SELECT * FROM keepem WHERE name=?', search_query)
+    one_item = c.fetchone()
+    all_item = c.fetchall()
+    # save and close connection
+    conn.commit()
+    conn.close()
