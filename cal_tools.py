@@ -20,7 +20,7 @@ def number_of_days_in_month(date_today):
 
     _start = datetime(int(date_today[0]), int(date_today[1]), int(date_today[2]))
     _end = datetime(int(date_today[0]), int(date_today[1]) + 1, int(date_today[2]))
-    date_days_in_month = int(lens
+    date_days_in_month = int(len
         (arrow.Arrow.range('day', _start, _end)) - 1
         )
     return date_days_in_month
