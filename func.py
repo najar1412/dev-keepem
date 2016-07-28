@@ -1,115 +1,85 @@
 import sqlite3
 import os
-import arrow
 from datetime import datetime
 import datetime as dt
-
 import random
 
+import arrow
+
+from db import db_items, db_item_filter
 
 
+def get_day_name(monday=1):
+    day_name = {
+        1: 'Monday', 2: 'Tuesday', 3: 'Wednesday', 4: 'Thursday',
+        5: 'Friday', 6: 'Saturday', 7: 'Sunday'
+        }
+    return day_name[monday]
 
-def mock_item():
-    name='mock_name'
-    value = 10
-    cost = 10.0
-    item = tuple([name, value, cost])
-    return item
+
+def number_of_days_in_month(date_today):
+    _arrow_date = arrow.utcnow()
+    date_today = tuple(str(_arrow_date.format()).split(' ')[0].split('-'))
+
+    _start = datetime(int(date_today[0]), int(date_today[1]), int(date_today[2]))
+    _end = datetime(int(date_today[0]), int(date_today[1]) + 1, int(date_today[2]))
+    date_days_in_month = int(len(
+        arrow.Arrow.range('day', _start, _end)) - 1
+        )
+    return date_days_in_month
 
 
 def get_month(month=''):
     result_month = []
-    date_day_name = {
-        1: 'Monday', 2: 'Tuesday', 3: 'Wednesday', 4: 'Thursday',
-        5: 'Friday', 6: 'Saturday', 7: 'Sunday'
-        }
-
-    date_today = arrow.utcnow()
-    date_month = date_today.datetime.month
-    date_day = date_today.datetime.day
-    date_year = date_today.datetime.year
-
-    start = datetime(2016, date_month, 1)
-    end = datetime(2016, date_month + 1, 1)
-    date_days_in_month = int(len(
-        arrow.Arrow.range('day', start, end)) - 1
-        )
-
-    date_day_int = datetime(date_year, date_month, 1).isoweekday()
     minus_days = []
 
-    # Helper
-    _date_tuple = tuple(str(date_today.format()).split(' ')[0].split('-'))
-    _date_day_list = list(range(date_days_in_month + 1)[1:])
+    _arrow_date = arrow.utcnow()
+    date_today = tuple(str(_arrow_date.format()).split(' ')[0].split('-'))
 
+    date_days_in_month = number_of_days_in_month(date_today)
+    date_day_int = datetime(int(date_today[0]), int(date_today[1]), 1).isoweekday()
+    date_day_list = list(range(date_days_in_month + 1)[1:])
+
+    # Minus day padding
     if date_day_int != 1:
         for i in range(date_day_int - 1):
             _minus_day = '-{}'.format(i)
             minus_days.append(_minus_day)
 
-    result_month.append(_date_tuple)
-    result_month.append(date_day_name[date_day_int])
+    result_month.append(date_today)
+    result_month.append(get_day_name(date_day_int))
     result_month.append(date_days_in_month)
     result_month.append(minus_days)
-    result_month.append(_date_day_list)
+    result_month.append(date_day_list)
 
     return result_month
 
-def generate_calendar(amount=150):
+def random_calendar(amount=150):
     calendar = {}
-    item_pool = [
-        ('date night', 7, 60.0, 4),
-        ('cinema', 7, 30.0, 4),
-        ('Museum of Natural History', 10, 20.0, 1),
-        ('Storm King Art Center', 10, 60.0, 1),
-        ('Mohonk Mountain house', 10, 100.0, 1),
-        ('Excerise', 1, 0.0, 10),
-        ('Concert', 7, 100.0, 2),
-        ('Wolffer Estate Vineyards', 10, 50.0, 1),
-        ('Comedy Show', 7, 30.0, 4),
-        ('TV Night', 2, 10.0, 8),
-        ('Camping', 10, 60.0, 1),
-        ('Go for a Drive', 4, 20.0, 7),
-        ('Picnic in the Park', 7, 20.0, 4),
-        ('Random Gift Night', 10, 50.0, 1)
-        ]
-
-    # TODO: Figure out how to weight items
-    weighted_choices = [('Red', 3), ('Blue', 2), ('Yellow', 1), ('Green', 4)]
-    population = [val for val, cnt in weighted_choices for i in range(cnt)]
-    random.choice(population)
-
-
-    item_select = []
-    value = 0
-    overall_value = 0
-    overall_cost = 0
-    high_value_filter = 0
 
     month_detail = get_month()
-    days_of_month = month_detail[-1]
-    item = random.choice(item_pool)
-    print(item)
+    item_select = db_item_filter(amount)
 
-
-    while value <= amount:
-        item = random.choice(item_pool)
-        if item in item_select and item[1] > 9:
-            high_value_filter += 1
-            if high_value_filter >= 2:
-                item = random.choice(item_pool)
-                value += item[1]
-                item_select.append(item)
-        else:
-            value += item[1]
-            item_select.append(item)
-
-    for day in days_of_month:
+    for day in month_detail[-1]:
         calendar[day] = '.'
 
     for item in item_select:
-        random_date = random.choice(days_of_month)
+        random_date = random.choice(month_detail[-1])
         calendar[random_date] = item
+
+    return calendar
+
+def generate_calendar(amount=150):
+    calendar = random_calendar(amount)
+    value = 0
+    overall_value = 0
+    overall_cost = 0
+
+    month_detail = get_month()
+    days_of_month = month_detail[-1]
+    item_select = db_item_filter(amount)
+    item = random.choice(item_select)
+
 
     for value in calendar.items():
         if value[1] != '.':
@@ -121,8 +91,6 @@ def generate_calendar(amount=150):
     month_detail.append(calendar)
 
     return month_detail
-
-generate_calendar()
 
 def keepem_db():
     if os.path.isfile('./keepem.db'):
