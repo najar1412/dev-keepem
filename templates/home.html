@@ -1,0 +1,87 @@
+
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+
+
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+        <!-- jQuery library -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+        <!-- Latest compiled JavaScript -->
+        <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+
+
+  <link rel=stylesheet type=text/css href="{{ url_for('static', filename='main.css') }}">
+</head>
+<body>
+<br>
+<br>
+<br>
+<br>
+<div id="cal_holder">
+<form method="post" action="{{ url_for('update') }}">
+<div id="slider">
+	<input class="bar" type="range" id="rangeinput" name="slider_value" value="{{ value }}" onchange="rangevalue.value=value"/>
+        <output id="rangevalue">50</output>
+</div>
+<button type="submit" class="btn btn-success btn-block">Update Calendar</button>
+</form>
+
+value:
+{{ calendar.4.0 }}<br>
+cost:
+${{ calendar.4.1 }}
+
+<hr>
+
+<div id="daybox" style="background-color:rgb(245, 245, 245);height:auto;text-align: center">
+    <small><strong>Monday</strong></small>
+</div>
+<div id="daybox" style="background-color:rgb(245, 245, 245);height:auto;text-align: center">
+    <small><strong>Tuesday</strong></small>
+</div>
+<div id="daybox" style="background-color:rgb(245, 245, 245);height:auto;text-align: center">
+    <small><strong>Wednesday</strong></small>
+</div>
+<div id="daybox" style="background-color:rgb(245, 245, 245);height:auto;text-align: center">
+    <small><strong>Thursday</strong></small>
+</div>
+<div id="daybox" style="background-color:rgb(245, 245, 245);height:auto;text-align: center">
+    <small><strong>Friday</strong></small>
+</div>
+<div id="daybox" style="background-color:rgb(245, 245, 245);height:auto;text-align: center">
+    <small><strong>Saturday</strong></small>
+</div>
+<div id="daybox" style="background-color:rgb(245, 245, 245);height:auto;text-align: center">
+    <small><strong>Sunday</strong></small>
+</div>
+
+<br>
+
+
+{% for day in calendar.5.items() %}
+
+
+
+<div id="daybox">
+    <div style="background-color:rgb(245, 245, 245);text-align:center;width=100%;">
+  <small>{{ day.0 }}</small>
+  </div>
+  {{ day.1.0 }}
+</div>
+{% endfor %}
+
+
+
+</div>
+
+
+
+
+</body>
+</html>
