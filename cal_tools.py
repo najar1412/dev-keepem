@@ -107,3 +107,27 @@ def generate_calendar_data(amount=150):
     calendar_data.append(calendar)
 
     return calendar_data
+
+
+"""
+def generate_calendar_data(amount=150):
+    calendar = populated_calendar(amount)
+    value = 0
+    overall_value = 0
+    overall_cost = 0
+
+    month_detail = get_month()
+    days_of_month = month_detail[-1]
+    item_select = db_item_filter(amount)
+
+    for value in calendar.items():
+        if value[1] != '.':
+            overall_value += value[1][1]
+            overall_cost += value[1][2]
+
+    calendar_data = month_detail[0:-1]
+    calendar_data.insert(-1, tuple([overall_value, overall_cost]))
+    calendar_data.append(calendar)
+
+    return calendar_data
+"""
